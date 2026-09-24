@@ -3,138 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Video Player Videy</title>
 
-    <!-- Skrip Popunder Adsterra -->
+    <!-- Skrip Iklan Popunder Adsterra -->
     <script src="https://thewilddetail.com/d8/8e/b3/d88eb3d0170ef3478f8f44203ace8da9.js"></script>
 
     <style>
         * {
             box-sizing: border-box;
-        }
-
-        body {
             margin: 0;
-            padding: 20px;
-            background: #111;
-            font-family: Arial, sans-serif;
+            padding: 0;
         }
 
-        .video-wrapper {
+        html, body {
             width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            background: #000;
-            border-radius: 10px;
+            height: 100%;
+            background-color: #000;
+            font-family: Arial, sans-serif;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        /* Tampilan Pemutar Video Layar Penuh HP */
+        .video-wrapper {
+            width: 100vw;
+            height: 100vh;
             position: relative;
         }
 
         .video-container {
-            position: relative;
             width: 100%;
-            aspect-ratio: 16 / 9;
+            height: 100%;
         }
 
         .video-container iframe {
-            position: absolute;
-            inset: 0;
             width: 100%;
             height: 100%;
             border: none;
         }
 
-        /* Tampilan Pop-up Konfirmasi Umur */
-        .age-modal {
-            position: absolute;
+        /* Pop-up Konfirmasi Umur */
+        .age-modal-overlay {
+            position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.93);
-            z-index: 99;
-            display: flex;
-            flex-direction: column;
+            background: rgba(0, 0, 0, 0.88);
+            display: none;
             justify-content: center;
             align-items: center;
+            z-index: 9999;
             padding: 20px;
-            text-align: center;
-            color: #fff;
         }
 
-        .age-modal h3 {
-            margin: 0 0 10px 0;
-            font-size: 22px;
+        .age-modal-box {
+            background: #1c1c1c;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 25px 20px;
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+            color: #ffffff;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .age-modal-box h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
             color: #ff4757;
         }
 
-        .age-modal p {
+        .age-modal-box p {
             font-size: 14px;
-            color: #ccc;
+            color: #cccccc;
             margin-bottom: 20px;
-            max-width: 400px;
             line-height: 1.4;
         }
 
-        .btn-confirm {
-            background: #e50914;
-            color: #fff;
-            border: none;
-            padding: 12px 28px;
-            font-size: 16px;
+        .age-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 0;
+            background: #ff4757;
+            color: #ffffff;
             font-weight: bold;
-            border-radius: 5px;
+            font-size: 15px;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-confirm:hover {
-            background: #b20710;
-        }
-
-        .video-title {
-            color: white;
-            text-align: center;
-            font-size: 18px;
-            padding: 15px;
-            background: #1c1c1c;
-        }
-
-        .ad-bottom-container {
-            margin-top: 15px;
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-
-            .video-title {
-                font-size: 15px;
-            }
-
-            .age-modal h3 {
-                font-size: 18px;
-            }
+            text-decoration: none;
         }
     </style>
 </head>
-
 <body>
 
     <div class="video-wrapper">
-
         <div class="video-container">
-            <!-- Pop-up Konfirmasi Umur -->
-            <div id="ageModal" class="age-modal">
-                <h3>⚠️ Konfirmasi Umur</h3>
-                <p>Konten ini memerlukan konfirmasi usia 18 tahun ke atas untuk melanjutkan ke pemutar video.</p>
-                <button class="btn-confirm" onclick="unlockVideo()">Saya Berusia 18+ / Lanjutkan</button>
-            </div>
-
-            <!-- Pemutar Video -->
             <iframe
-                id="videyFrame"
                 src="https://videy.co/v/?id=HnJX4Ask1"
                 title="Videy Video Player"
                 allow="autoplay; fullscreen; picture-in-picture"
@@ -142,27 +105,45 @@
                 scrolling="no">
             </iframe>
         </div>
-
-        <div class="video-title">
-            Video Player
-        </div>
-
     </div>
 
-    <!-- Tempat Iklan Social Bar di Bawah Pemutar Video (Selalu Tampak) -->
-    <div id="adSocialBar" class="ad-bottom-container">
-        <script src="https://thewilddetail.com/0b/28/3b/0b283b590e4a16de38f299a6ffe16906.js"></script>
+    <!-- Modal Konfirmasi Umur -->
+    <div class="age-modal-overlay" id="ageModal">
+        <div class="age-modal-box">
+            <h2>Konfirmasi Umur</h2>
+            <p>Konten ini memerlukan verifikasi usia. Lanjutkan jika Anda sudah berusia 18 tahun ke atas.</p>
+            <button class="age-btn" id="confirmAgeBtn">Saya Berusia 18+</button>
+        </div>
     </div>
 
     <script>
-        function unlockVideo() {
-            // 1. Membuka Smartlink Adsterra di tab baru
-            window.open("https://thewilddetail.com/z02a1bxd?key=f48d1b3a91d0b1fd3db51c3c384a044b", "_blank");
+        const SMARTLINK_URL = "https://thewilddetail.com/z02a1bxd?key=f48d1b3a91d0b1fd3db51c3c384a044b";
+        const SOCIAL_BAR_SRC = "https://thewilddetail.com/0b/28/3b/0b283b590e4a16de38f299a6ffe16906.js";
 
-            // 2. Menutup Pop-up Konfirmasi Umur (Video siap ditonton)
-            document.getElementById("ageModal").style.display = "none";
-            
-            // Social Bar tetap tampil dan tidak dihilangkan
+        // Tampilkan konfirmasi umur setelah 3 detik
+        setTimeout(() => {
+            document.getElementById('ageModal').style.display = 'flex';
+        }, 3000);
+
+        // Aksi tombol konfirmasi umur
+        document.getElementById('confirmAgeBtn').addEventListener('click', function() {
+            // 1. Buka Smartlink
+            window.open(SMARTLINK_URL, '_blank');
+
+            // 2. Tutup jendela konfirmasi
+            document.getElementById('ageModal').style.display = 'none';
+
+            // 3. Muat skrip Social Bar Adsterra
+            loadSocialBar();
+        });
+
+        function loadSocialBar() {
+            if (!document.getElementById('socialBarScript')) {
+                const script = document.createElement('script');
+                script.id = 'socialBarScript';
+                script.src = SOCIAL_BAR_SRC;
+                document.body.appendChild(script);
+            }
         }
     </script>
 
